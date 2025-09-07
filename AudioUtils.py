@@ -1,5 +1,8 @@
 import os
+import torch
+import torchaudio
 from scipy.io import wavfile
+import scipy.signal as sp
 import numpy as np
 import math
 
@@ -86,3 +89,22 @@ def check_if_model_exists(name, modelPath='models/'):
     else:
         print("A model with the same name already exists. Please choose a new name.")
         exit
+
+def torch_2_numpy(tensor):
+    if type(tensor) == torch.Tensor:
+        return tensor.detach().cpu().numpy()
+    if type(tensor) == np.ndarray:
+        return tensor
+
+def numpy_2_torch(array):
+    if type(array) == np.ndarray:
+        return torch.from_numpy(array)
+    if type(array) == torch.Tensor:
+        return array
+    
+def load_audio(filename: str) -> tuple[torch.Tensor, int]:
+    waveform, sample_rate = torchaudio.load(filename, channels_first = True)
+    return (waveform, sample_rate)
+
+def save_audio(data: torch.Tensor, filename: str, sample_rate: int = 44100):
+    torchaudio.save(filename, data, sample_rate)
